@@ -1,6 +1,10 @@
 import axios from "axios"
 import ThrottleFetch from '../index'
-const fetcher = axios.get('/user')
+const servise = axios.create()
+servise.interceptors.response.use(resp => {
+    return resp.data
+})
+const fetcher = () => servise.get('http://localhost:3000/user')
 const useUser = new ThrottleFetch(fetcher)
 const foo = async() => {
     try {
