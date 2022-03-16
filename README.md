@@ -1,4 +1,5 @@
 [![Node.js CI](https://github.com/Meglody/Cached-throttle-promise/actions/workflows/node.js.yml/badge.svg?branch=main)](https://github.com/Meglody/Cached-throttle-promise/actions/workflows/node.js.yml)
+[![codecov](https://codecov.io/gh/Meglody/Cached-throttle-promise/branch/main/graph/badge.svg?token=Y74DLS11DU)](https://codecov.io/gh/Meglody/Cached-throttle-promise)
 
 ### 背景
 
