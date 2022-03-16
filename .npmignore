@@ -1,2 +1,6 @@
 lib/
 test/
+.nyc_output/
+coverage/
+.github/
+node_modules/
