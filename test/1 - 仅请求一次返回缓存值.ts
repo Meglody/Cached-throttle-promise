@@ -1,5 +1,5 @@
 import axios from "axios"
-import ThrottleFetch from '../index'
+import ThrottleFetch from '../lib/index'
 const servise = axios.create()
 servise.interceptors.response.use(resp => {
     return resp.data

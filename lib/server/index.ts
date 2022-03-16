@@ -17,12 +17,11 @@ app.use(async (ctx, next) => {
     const start = Date.now();
     await next();
     const ms = Date.now() - start;
-    console.log(`${ctx.method} ${ctx.url} - ${ms}`);
+    // console.log(`${ctx.method} ${ctx.url} - ${ms}`);
 });
 
 router.get('/user',async (ctx) => {
     const r = Math.floor(Math.random() * 999)
-    console.log(r)
     ctx.type = 'application/json';
     ctx.body = {
         code: 0,
@@ -47,4 +46,4 @@ app.on('error', err => {
     console.error('server error', err)
 });
 
-app.listen(3000)
+export default app
