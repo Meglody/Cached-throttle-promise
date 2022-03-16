@@ -45,13 +45,13 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
     - name: Run Coverage Report
-    - run: npm run coverage
+      - run: npm run coverage
     - name: Upload coverage to Codecov
-    - uses: codecov/codecov-action@v2
-      with:
-        token: ${{ secrets.CODECOV_TOKEN }}
-        name: codecov-umbrella
-        directory: './coverage/'
-        fail_ci_if_error: true 
-        verbose: true
+      - uses: codecov/codecov-action@v2
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          name: codecov-umbrella
+          directory: './coverage/'
+          fail_ci_if_error: true 
+          verbose: true
         
