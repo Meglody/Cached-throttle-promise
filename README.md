@@ -14,3 +14,43 @@
 
 ### 这个库不适合什么场景
  - 有副作用的函数（因为被定义的行为理论上只会执行一次）
+
+### 使用
+
+```js
+// 封装你认为可以缓存使用的请求
+const userInfo = () => fetch('/user')
+const useUser = new ThrottleFetch(userInfo)
+export default useUser
+```
+
+```jsx
+import useUser from './useUser'
+const UserInfo = async () => {
+  const res = await useUser.act()
+  return (
+    <div class="user-info" onClick={viewInfo}>
+        <span>{res.name}</span>
+    </div>
+  );
+};
+const viewInfo = async () => {
+  const res = await useUser.act()
+  console.log(res.name)
+};
+```
+
+这两步操作只会产生一次请求
+
+如果你想刷新一次数据
+
+```js
+const refreshUserInfo = () => useUser.refresh();
+const RefreshButton = async () => {
+  return (
+    <button class="refresh-user-info" onClick={refreshUserInfo}>
+        刷新用户数据
+    </button>
+  );
+};
+```
