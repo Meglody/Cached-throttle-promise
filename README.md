@@ -1,3 +1,5 @@
+[![Node.js CI](https://github.com/Meglody/Cached-throttle-promise/actions/workflows/node.js.yml/badge.svg?branch=main)](https://github.com/Meglody/Cached-throttle-promise/actions/workflows/node.js.yml)
+
 ### 背景
 
 由于业务逻辑的原因，在我们写页面时定义了一些重复的行为。
