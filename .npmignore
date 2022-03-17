@@ -4,3 +4,4 @@ test/
 coverage/
 .github/
 node_modules/
+tsconfig.json
