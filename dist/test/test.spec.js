@@ -35,11 +35,14 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 var chai_1 = require("chai");
-var __1 = require("..");
-var index_1 = require("../server/index");
-var axios_1 = require("axios");
+var __1 = __importDefault(require(".."));
+var index_1 = __importDefault(require("../server/index"));
+var axios_1 = __importDefault(require("axios"));
 var servise = axios_1.default.create();
 servise.interceptors.response.use(function (resp) {
     return resp.data;
