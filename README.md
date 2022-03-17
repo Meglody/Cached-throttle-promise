@@ -15,6 +15,12 @@
 ### 这个库不适合什么场景
  - 有副作用的函数（因为被定义的行为理论上只会执行一次）
 
+### 安装
+
+```shell
+npm install cached-throttle-promise --save
+```
+
 ### 使用
 
 ```js
