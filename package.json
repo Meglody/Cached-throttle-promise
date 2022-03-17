@@ -2,7 +2,8 @@
   "name": "cached-throttle-promise",
   "version": "0.1.7",
   "description": "throttle the frequency of promise requests",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
   "directories": {
     "test": "test"
   },
