@@ -1,12 +1,13 @@
-declare class ThrottleFetch {
-    currentAction: () => Promise<any>;
-    constructor(action: () => Promise<any>);
+declare class ThrottleFetch<T> {
+    currentAction: () => Promise<T>;
+    constructor(action: () => Promise<T>);
     dirty: boolean;
-    result: null;
     flushing: boolean;
-    set: Set<(value: unknown) => void>;
-    act: () => Promise<unknown>;
+    do: boolean;
+    result: T | null;
+    set: Set<(value: ThrottleFetch<T>['result']) => void>;
+    act: () => Promise<ThrottleFetch<T>['result']>;
     refreshing: boolean;
-    refresh: () => Promise<unknown>;
+    refresh: () => Promise<T | null>;
 }
 export default ThrottleFetch;
