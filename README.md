@@ -26,40 +26,36 @@ npm install cached-throttle-promise --save
 
 ### 使用
 
-```js
+```ts
 // 封装你认为可以缓存使用的请求
-const userInfo = () => fetch('/user')
-const useUser = new ThrottleFetch(userInfo)
+const axiosServise = axios.create()
+axiosServise.interceptors.response.use(res => res.data)
+const fetchUser = () => axiosServise.get("/user")
+const useUser = new ThrottleFetch(fetchUser);
 export default useUser
 ```
 
-```jsx
+```tsx
 import useUser from './useUser'
-const UserInfo = async () => {
-  const res = await useUser.act()
-  return (
-    <div class="user-info" onClick={viewInfo}>
-        <span>{res.name}</span>
+const getUser = async(callback: (value: any) => void) => {
+    const res = await useUser.act() as AxiosResponse<any, any> 
+    callback(res.data)
+}
+// 如果你想刷新一次数据
+const refreshInfo = () => {
+    useUser.refresh()
+    getUser(setUserInfo)
+}
+const UserInfo = () => {
+  const [userInfo, setUserInfo] = useState<{username: string, id: number}>({username: 'admin', id: 0})
+  useEffect(() => {
+    getUser(setUserInfo)
+  }, [])
+  return <>
+    <div className="user-info" onClick={() => getUser(setUserInfo)}>
+      <span>{userInfo.username + userInfo.id}</span>
     </div>
-  );
-};
-const viewInfo = async () => {
-  const res = await useUser.act()
-  console.log(res.name)
-};
-```
-
-这两步操作只会产生一次请求
-
-如果你想刷新一次数据
-
-```js
-const refreshUserInfo = () => useUser.refresh();
-const RefreshButton = async () => {
-  return (
-    <button class="refresh-user-info" onClick={refreshUserInfo}>
-        刷新用户数据
-    </button>
-  );
+    <button onClick={refreshInfo}>刷新</button>
+  </>;
 };
 ```
