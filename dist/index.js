@@ -43,10 +43,11 @@ var ThrottleFetch = /** @class */ (function () {
         this.dirty = true;
         this.flushing = false;
         this.do = false;
+        this.p = Promise;
         this.result = null;
         this.set = new Set();
         this.act = function () { return new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
-            var res, error_1;
+            var res, error_1, excutor_1;
             var _this = this;
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -70,37 +71,45 @@ var ThrottleFetch = /** @class */ (function () {
                         if (this.do) {
                             // 执行所有的异步任务
                             resolve(this.result);
-                            // 执行所有的同步任务（每次微任务结束都会查询宏任务，节流一下）
+                            // 执行所有的同步任务（节流一下，仅第一次会执行）
                             if (!this.flushing) {
                                 this.flushing = true;
                                 this.set.forEach(function (excutor) {
                                     excutor(_this.result);
-                                    _this.set.delete(excutor);
                                 });
                             }
                         }
                         else {
-                            // 压入的是同步任务：例如：
-                            // const baz = () => {
-                            //     const resp4 = useUser.act()
-                            //     const resp5 = useUser.act()
-                            // }
-                            // 这样的
-                            this.set.add(resolve);
+                            excutor_1 = function (result) {
+                                resolve(result);
+                                setTimeout(function () {
+                                    _this.set.delete(excutor_1);
+                                    !_this.set.size && _this.reset();
+                                });
+                            };
+                            this.set.add(excutor_1);
                         }
                         return [2 /*return*/];
                 }
             });
         }); }); };
-        this.refreshing = false;
+        this.reset = function () {
+            _this.do = false;
+            _this.flushing = false;
+            _this.dirty = true;
+            // 查看有无正在等待刷新的任务
+            _this.needFresh && _this.refresh();
+        };
+        // 等待刷新的任务
+        this.needFresh = false;
         this.refresh = function () { return __awaiter(_this, void 0, void 0, function () {
             var res;
             return __generator(this, function (_a) {
-                if (!this.refreshing) {
-                    this.refreshing = true;
-                    this.do = false;
-                    this.flushing = false;
-                    this.dirty = true;
+                if (this.dirty) {
+                    this.needFresh = false;
+                }
+                else {
+                    this.needFresh = true;
                 }
                 res = this.act();
                 return [2 /*return*/, res];

@@ -28,7 +28,8 @@ router.get('/user',async (ctx) => {
         data: {
             id: r,
             username: 'Bob',
-            age: 18
+            age: 18,
+            habbits: ['TypeScript', 'JavaScript', 'WebGL']
         }
     };
 })

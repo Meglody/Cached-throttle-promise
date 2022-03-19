@@ -13,7 +13,7 @@
  - 解决页面多实例执行同一个action时会造成的资源浪费
  - 解决同一个页面多组件同时请求的赘余
  - 缓存一个行为的结果
-
+****
 ### 不适合什么场景
  - 有副作用的函数（因为被定义的行为理论上只会执行一次）
  - fetch获取数据（因为fetch用于获取数据返回值的.json()方法被设计为仅能消费一次）
@@ -26,36 +26,83 @@ npm install cached-throttle-promise --save
 
 ### 使用
 
+```index.d.ts
+declare type User {
+    username: string
+    id: number
+    age: number
+    habbits: Array<string>
+}
+```
+
 ```ts
+// axios.ts
 // 封装你认为可以缓存使用的请求
+import axios from "axios";
 const axiosServise = axios.create()
 axiosServise.interceptors.response.use(res => res.data)
-const fetchUser = () => axiosServise.get("/user")
-const useUser = new ThrottleFetch(fetchUser);
+export default axiosServise
+```
+
+```tsx
+// useUser.ts
+// 封装行为
+import ThrottleFetch from 'cached-throttle-promise';
+import axios from './axios'
+import User from '..'
+const axiosUser = () => axios.get<User>("/user")
+const useUser = new ThrottleFetch(axiosUser);
 export default useUser
 ```
 
 ```tsx
-import useUser from './useUser'
-const getUser = async(callback: (value: any) => void) => {
-    const res = await useUser.act() as AxiosResponse<any, any> 
-    callback(res.data)
-}
-// 如果你想刷新一次数据
-const refreshInfo = () => {
-    useUser.refresh()
-    getUser(setUserInfo)
-}
-const UserInfo = () => {
-  const [userInfo, setUserInfo] = useState<{username: string, id: number}>({username: 'admin', id: 0})
-  useEffect(() => {
-    getUser(setUserInfo)
-  }, [])
+// UserInfo.tsx
+// 一个页面
+import { useEffect, useState } from "react";
+import useUser from "../utils/useUser";
+import User from '..'
+export default function () {
   return <>
-    <div className="user-info" onClick={() => getUser(setUserInfo)}>
-      <span>{userInfo.username + userInfo.id}</span>
-    </div>
-    <button onClick={refreshInfo}>刷新</button>
+    <UserInfo/>
+    <UserHabbits/>
   </>;
-};
+}
+const getUser = async(callback: (value: any) => void) => {
+    const res = await useUser.act()
+    res && callback(res.data)
+}
+
+const UserInfo = () => {
+    const [userInfo, setUserInfo] = useState<User>({username: 'admin', age: 18, id: 0, habbits: []})
+
+    useEffect(() => {
+      getUser(setUserInfo)
+    }, [])
+
+    const refresh = async () => {
+        await useUser.refresh()
+        getUser(setUserInfo)
+    }
+
+    return <>
+      <div className="user-info" onClick={() => getUser(setUserInfo)}>
+        Name: <span>{userInfo.username + userInfo.id}</span>
+        <button onClick={refresh}>refresh</button>
+      </div>
+    </>;
+}
+
+const UserHabbits = () => {
+    const [userInfo, setUserInfo] = useState<User>({username: 'admin', age: 18, id: 0, habbits: []})
+
+    useEffect(() => {
+      getUser(setUserInfo)
+    }, [])
+    
+    return <>
+      <div className="user-info" onClick={() => getUser(setUserInfo)}>
+        Habbits: {userInfo.habbits.map((h, hIndex) => <span key={hIndex} style={{margin: '0px 10px'}}>{h}</span>)}
+      </div>
+    </>;
+}
 ```

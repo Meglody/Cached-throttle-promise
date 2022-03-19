@@ -54,7 +54,7 @@ describe('===> Suit(No.1): Case multiple using instance.act() in async env', fun
             var fetcher = function () { return servise.get('http://localhost:3000/user'); };
             var useUser = new __1.default(fetcher);
             var foo = function () { return __awaiter(void 0, void 0, void 0, function () {
-                var resp, resp1, res;
+                var resp, resp1;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0: return [4 /*yield*/, useUser.act()];
@@ -63,8 +63,7 @@ describe('===> Suit(No.1): Case multiple using instance.act() in async env', fun
                             return [4 /*yield*/, useUser.act()];
                         case 2:
                             resp1 = _a.sent();
-                            res = resp === resp1;
-                            (0, chai_1.expect)(res).to.be.equal(true);
+                            (0, chai_1.expect)(resp).to.equal(resp1);
                             return [2 /*return*/];
                     }
                 });
@@ -110,8 +109,70 @@ describe('===> Suit(No.2): Case multiple using instance.act() in sync env', func
                 });
             }); };
             baz().then(function () {
-                (0, chai_1.expect)(value_0 === value_1).to.be.equal(true);
+                (0, chai_1.expect)(value_0).to.equal(value_1);
                 done();
+            });
+        });
+        it('only returns one cached value again', function (done) {
+            var fetcher = function () { return servise.get('http://localhost:3000/user'); };
+            var useUser = new __1.default(fetcher);
+            var value_0, value_1;
+            var foo = function () { return __awaiter(void 0, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, useUser.act()];
+                        case 1:
+                            value_0 = _a.sent();
+                            return [2 /*return*/];
+                    }
+                });
+            }); };
+            var bar = function () { return __awaiter(void 0, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, useUser.act()];
+                        case 1:
+                            value_1 = _a.sent();
+                            return [2 /*return*/];
+                    }
+                });
+            }); };
+            foo();
+            bar().then(function () {
+                (0, chai_1.expect)(value_0).to.equal(value_1);
+                done();
+            });
+        });
+        it('only returns one cached value, event in macro-tasks', function (done) {
+            var fetcher = function () { return servise.get('http://localhost:3000/user'); };
+            var useUser = new __1.default(fetcher);
+            var value_0, value_1;
+            var foo = function () { return __awaiter(void 0, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, useUser.act()];
+                        case 1:
+                            value_0 = _a.sent();
+                            return [2 /*return*/];
+                    }
+                });
+            }); };
+            var bar = function () { return __awaiter(void 0, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, useUser.act()];
+                        case 1:
+                            value_1 = _a.sent();
+                            return [2 /*return*/];
+                    }
+                });
+            }); };
+            foo();
+            setTimeout(function () {
+                bar().then(function () {
+                    (0, chai_1.expect)(value_0).to.equal(value_1);
+                    done();
+                });
             });
         });
         return [2 /*return*/];
@@ -119,7 +180,43 @@ describe('===> Suit(No.2): Case multiple using instance.act() in sync env', func
 }); });
 describe('===> Suit(No.3): Case refresh', function () { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
-        it('two values not equal', function (done) {
+        it('only returns one cached value', function (done) {
+            var fetcher = function () { return servise.get('http://localhost:3000/user'); };
+            var useUser = new __1.default(fetcher);
+            var value_0, value_1;
+            var foo = function () { return __awaiter(void 0, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, useUser.act()];
+                        case 1:
+                            value_0 = _a.sent();
+                            return [2 /*return*/];
+                    }
+                });
+            }); };
+            var bar = function () { return __awaiter(void 0, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, useUser.refresh()];
+                        case 1:
+                            value_1 = _a.sent();
+                            return [2 /*return*/];
+                    }
+                });
+            }); };
+            var baz = function () { return __awaiter(void 0, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    foo();
+                    bar();
+                    return [2 /*return*/];
+                });
+            }); };
+            baz().then(function () {
+                (0, chai_1.expect)(value_0).to.equal(value_1);
+                done();
+            });
+        });
+        it('only returns one cached value again', function (done) {
             var fetcher = function () { return servise.get('http://localhost:3000/user'); };
             var useUser = new __1.default(fetcher);
             var value_0, value_1, value_2;
@@ -147,16 +244,47 @@ describe('===> Suit(No.3): Case refresh', function () { return __awaiter(void 0,
                 });
             }); };
             foo();
-            setTimeout(function () { return __awaiter(void 0, void 0, void 0, function () {
+            bar().then(function () {
+                (0, chai_1.expect)(value_0).to.equal(value_1);
+                (0, chai_1.expect)(value_1).to.equal(value_2);
+                done();
+            });
+        });
+        it('only returns one cached value, event in macro-tasks', function (done) {
+            var fetcher = function () { return servise.get('http://localhost:3000/user'); };
+            var useUser = new __1.default(fetcher);
+            var value_0, value_1, value_2;
+            var foo = function () { return __awaiter(void 0, void 0, void 0, function () {
                 return __generator(this, function (_a) {
-                    (0, chai_1.expect)(value_0 !== value_1).to.be.equal(true);
-                    (0, chai_1.expect)(value_1 === value_2).to.be.equal(true);
-                    bar().then(function () {
-                        done();
-                    });
-                    return [2 /*return*/];
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, useUser.act()];
+                        case 1:
+                            value_0 = _a.sent();
+                            return [2 /*return*/];
+                    }
                 });
-            }); }, 10);
+            }); };
+            var bar = function () { return __awaiter(void 0, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, useUser.refresh()];
+                        case 1:
+                            value_1 = _a.sent();
+                            return [4 /*yield*/, useUser.act()];
+                        case 2:
+                            value_2 = _a.sent();
+                            return [2 /*return*/];
+                    }
+                });
+            }); };
+            foo();
+            setTimeout(function () {
+                bar().then(function () {
+                    (0, chai_1.expect)(value_0).to.equal(value_1);
+                    (0, chai_1.expect)(value_1).to.equal(value_2);
+                    done();
+                });
+            });
         });
         return [2 /*return*/];
     });
@@ -164,6 +292,46 @@ describe('===> Suit(No.3): Case refresh', function () { return __awaiter(void 0,
 describe('===> Suit(No.4): Case multiple using instance.refresh() in async env', function () { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
         it('only returns one cached value', function (done) {
+            var fetcher = function () { return servise.get('http://localhost:3000/user'); };
+            var useUser = new __1.default(fetcher);
+            var value_0, value_1, value_2;
+            var foo = function () { return __awaiter(void 0, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, useUser.act()];
+                        case 1:
+                            value_0 = _a.sent();
+                            return [2 /*return*/];
+                    }
+                });
+            }); };
+            var bar = function () { return __awaiter(void 0, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, useUser.refresh()];
+                        case 1:
+                            value_1 = _a.sent();
+                            return [4 /*yield*/, useUser.refresh()];
+                        case 2:
+                            value_2 = _a.sent();
+                            return [2 /*return*/];
+                    }
+                });
+            }); };
+            var baz = function () { return __awaiter(void 0, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    foo();
+                    bar();
+                    return [2 /*return*/];
+                });
+            }); };
+            baz().then(function () {
+                (0, chai_1.expect)(value_0).to.equal(value_1);
+                (0, chai_1.expect)(value_1).to.equal(value_2);
+                done();
+            });
+        });
+        it('only returns one cached value again', function (done) {
             var fetcher = function () { return servise.get('http://localhost:3000/user'); };
             var useUser = new __1.default(fetcher);
             var value_0, value_1, value_2, value_3;
@@ -194,18 +362,53 @@ describe('===> Suit(No.4): Case multiple using instance.refresh() in async env',
                 });
             }); };
             foo();
-            setTimeout(function () { return __awaiter(void 0, void 0, void 0, function () {
+            bar().then(function () {
+                (0, chai_1.expect)(value_0).to.equal(value_1);
+                (0, chai_1.expect)(value_1).to.equal(value_2);
+                (0, chai_1.expect)(value_2).to.equal(value_3);
+                done();
+            });
+        });
+        it('only returns one cached value, event in macro-tasks', function (done) {
+            var fetcher = function () { return servise.get('http://localhost:3000/user'); };
+            var useUser = new __1.default(fetcher);
+            var value_0, value_1, value_2, value_3;
+            var foo = function () { return __awaiter(void 0, void 0, void 0, function () {
                 return __generator(this, function (_a) {
-                    bar().then(function () {
-                        (0, chai_1.expect)(value_0 !== value_1).to.be.equal(true);
-                        (0, chai_1.expect)(value_1 === value_2).to.be.equal(true);
-                        (0, chai_1.expect)(value_2 === value_3).to.be.equal(true);
-                        done();
-                        server.close();
-                    });
-                    return [2 /*return*/];
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, useUser.act()];
+                        case 1:
+                            value_0 = _a.sent();
+                            return [2 /*return*/];
+                    }
                 });
-            }); }, 10);
+            }); };
+            var bar = function () { return __awaiter(void 0, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, useUser.refresh()];
+                        case 1:
+                            value_1 = _a.sent();
+                            return [4 /*yield*/, useUser.refresh()];
+                        case 2:
+                            value_2 = _a.sent();
+                            return [4 /*yield*/, useUser.act()];
+                        case 3:
+                            value_3 = _a.sent();
+                            return [2 /*return*/];
+                    }
+                });
+            }); };
+            foo();
+            setTimeout(function () {
+                bar().then(function () {
+                    (0, chai_1.expect)(value_0).to.equal(value_1);
+                    (0, chai_1.expect)(value_1).to.equal(value_2);
+                    (0, chai_1.expect)(value_2).to.equal(value_3);
+                    done();
+                    server.close();
+                });
+            });
         });
         return [2 /*return*/];
     });

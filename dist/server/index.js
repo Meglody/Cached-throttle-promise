@@ -84,7 +84,8 @@ router.get('/user', function (ctx) { return __awaiter(void 0, void 0, void 0, fu
             data: {
                 id: r,
                 username: 'Bob',
-                age: 18
+                age: 18,
+                habbits: ['TypeScript', 'JavaScript', 'WebGL']
             }
         };
         return [2 /*return*/];
