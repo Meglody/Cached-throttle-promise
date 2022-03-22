@@ -43,53 +43,72 @@ var ThrottleFetch = /** @class */ (function () {
         this.dirty = true;
         this.flushing = false;
         this.do = false;
-        this.p = Promise;
         this.result = null;
         this.set = new Set();
+        // act 的行为：
+        // 1 - 不管在同步异步中都表现出仅返回同一个缓存值的行为；
+        // 2 - 触发了refresh，之后的act值应该产生变化；
+        // 3 - 用户定义的诸如click等渲染层事件触发了act，也会产生变化（因为上一次循环已经结束，dirty已经变成了true）
         this.act = function () { return new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
             var res, error_1, excutor_1;
             var _this = this;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        if (!this.dirty) return [3 /*break*/, 4];
+                        if (!this.dirty) return [3 /*break*/, 7];
                         _a.label = 1;
                     case 1:
-                        _a.trys.push([1, 3, , 4]);
+                        _a.trys.push([1, 6, , 7]);
                         this.dirty = false;
-                        return [4 /*yield*/, this.currentAction()];
+                        if (!this.refreshAction.length) return [3 /*break*/, 3];
+                        // 增加一个改变result的副作用
+                        return [4 /*yield*/, this.clearRefreshStack()];
                     case 2:
+                        // 增加一个改变result的副作用
+                        _a.sent();
+                        return [3 /*break*/, 5];
+                    case 3: return [4 /*yield*/, this.currentAction()];
+                    case 4:
                         res = _a.sent();
                         this.result = res;
+                        _a.label = 5;
+                    case 5:
                         this.do = true;
-                        return [3 /*break*/, 4];
-                    case 3:
+                        return [3 /*break*/, 7];
+                    case 6:
                         error_1 = _a.sent();
                         reject(error_1);
-                        return [3 /*break*/, 4];
-                    case 4:
-                        if (this.do) {
+                        return [3 /*break*/, 7];
+                    case 7:
+                        if (!this.do) return [3 /*break*/, 9];
+                        // 增加一个改变result的副作用，查看是否有refresh事件
+                        return [4 /*yield*/, this.clearRefreshStack()
                             // 执行所有的异步任务
-                            resolve(this.result);
-                            // 执行所有的同步任务（节流一下，仅第一次会执行）
-                            if (!this.flushing) {
-                                this.flushing = true;
-                                this.set.forEach(function (excutor) {
-                                    excutor(_this.result);
-                                });
-                            }
+                        ];
+                    case 8:
+                        // 增加一个改变result的副作用，查看是否有refresh事件
+                        _a.sent();
+                        // 执行所有的异步任务
+                        resolve(this.result);
+                        // 执行所有的同步任务（节流一下，仅第一次会执行）
+                        if (!this.flushing) {
+                            this.flushing = true;
+                            this.set.forEach(function (excutor) {
+                                excutor(_this.result);
+                            });
                         }
-                        else {
-                            excutor_1 = function (result) {
+                        return [3 /*break*/, 10];
+                    case 9:
+                        excutor_1 = function (result) {
+                            setTimeout(function () {
                                 resolve(result);
-                                setTimeout(function () {
-                                    _this.set.delete(excutor_1);
-                                    !_this.set.size && _this.reset();
-                                });
-                            };
-                            this.set.add(excutor_1);
-                        }
-                        return [2 /*return*/];
+                                _this.set.delete(excutor_1);
+                                !_this.set.size && _this.reset();
+                            });
+                        };
+                        this.set.add(excutor_1);
+                        _a.label = 10;
+                    case 10: return [2 /*return*/];
                 }
             });
         }); }); };
@@ -97,22 +116,38 @@ var ThrottleFetch = /** @class */ (function () {
             _this.do = false;
             _this.flushing = false;
             _this.dirty = true;
-            // 查看有无正在等待刷新的任务
-            _this.needFresh && _this.refresh();
         };
         // 等待刷新的任务
         this.needFresh = false;
+        this.refreshAction = [];
+        this.clearRefreshStack = function () { return __awaiter(_this, void 0, void 0, function () {
+            var act, _a;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        if (!this.refreshAction.length) return [3 /*break*/, 2];
+                        this.reset();
+                        act = this.refreshAction.shift();
+                        if (!act) return [3 /*break*/, 2];
+                        _a = this;
+                        return [4 /*yield*/, act()];
+                    case 1:
+                        _a.result = _b.sent();
+                        _b.label = 2;
+                    case 2: return [2 /*return*/];
+                }
+            });
+        }); };
+        // refresh的行为：但凡使用refresh都会reset dirty并触发act，改变后续act的值
+        // 具体后续act是由哪个refresh触发的，看是外部调用是同步还是异步
+        // 1.异步按照异步的顺序在后面的act必然是前面的act或是refresh的结果
+        // 2.同步按照同步实际的执行，同一执行时间单位的，结果相同
         this.refresh = function () { return __awaiter(_this, void 0, void 0, function () {
-            var res;
+            var act;
             return __generator(this, function (_a) {
-                if (this.dirty) {
-                    this.needFresh = false;
-                }
-                else {
-                    this.needFresh = true;
-                }
-                res = this.act();
-                return [2 /*return*/, res];
+                act = this.act;
+                this.refreshAction.push(act);
+                return [2 /*return*/, act()];
             });
         }); };
         this.currentAction = action;
