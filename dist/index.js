@@ -118,7 +118,6 @@ var ThrottleFetch = /** @class */ (function () {
             _this.dirty = true;
         };
         // 等待刷新的任务
-        this.needFresh = false;
         this.refreshAction = [];
         this.clearRefreshStack = function () { return __awaiter(_this, void 0, void 0, function () {
             var act, _a;

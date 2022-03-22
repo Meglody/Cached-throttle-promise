@@ -61,7 +61,6 @@ class ThrottleFetch<T> {
         this.dirty = true
     }
     // 等待刷新的任务
-    needFresh = false
     refreshAction: ThrottleFetch<T>['act'][] = []
     clearRefreshStack = async () => {
         if(this.refreshAction.length){

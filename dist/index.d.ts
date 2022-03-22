@@ -8,7 +8,6 @@ declare class ThrottleFetch<T> {
     set: Set<(value: ThrottleFetch<T>['result']) => void>;
     act: () => Promise<ThrottleFetch<T>['result']>;
     reset: () => void;
-    needFresh: boolean;
     refreshAction: ThrottleFetch<T>['act'][];
     clearRefreshStack: () => Promise<void>;
     refresh: () => Promise<T | null>;
